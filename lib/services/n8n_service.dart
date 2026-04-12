@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:inventario_pyme_flutter/models/producto.dart';
+import '../models/producto.dart';
 
 class N8nService {
-  final String url = 'https://stevenpajarol1.app.n8n.cloud/webhook-test/inventario-pyme';
+  final String url = 'https://stevenpajarol1.app.n8n.cloud/webhook/inventario-pyme';
 
   Future<bool> enviarMovimiento(InventarioMovimiento movimiento) async {
     try {

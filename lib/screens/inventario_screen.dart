@@ -3,6 +3,8 @@ import '../models/producto.dart';
 import '../services/n8n_service.dart';
 
 class InventarioScreen extends StatefulWidget {
+  InventarioScreen({super.key});
+
   @override
   _InventarioScreenState createState() => _InventarioScreenState();
 }
@@ -73,7 +75,7 @@ class _InventarioScreenState extends State<InventarioScreen> {
               SizedBox(height: 15),
               
               DropdownButtonFormField<String>(
-                value: _tipoMovimiento,
+                initialValue: _tipoMovimiento,
                 decoration: InputDecoration(labelText: 'Tipo de Movimiento', border: OutlineInputBorder()),
                 items: [
                   DropdownMenuItem(value: 'entrada', child: Text('Entrada (+)')),
