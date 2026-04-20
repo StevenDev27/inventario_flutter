@@ -3,88 +3,158 @@ import '../models/producto.dart';
 import '../services/n8n_service.dart';
 
 class MovimientoScreen extends StatefulWidget {
-  const MovimientoScreen({super.key});
+  final Producto? producto;
+
+  const MovimientoScreen({super.key, this.producto});
 
   @override
   _MovimientoScreenState createState() => _MovimientoScreenState();
 }
 
 class _MovimientoScreenState extends State<MovimientoScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _idController = TextEditingController();
-  final _cantidadController = TextEditingController();
-  String _tipoMovimiento = 'entrada'; // Valor por defecto
-  bool _isLoading = false;
+  TextEditingController cantidadController = TextEditingController();
+  final N8nService n8nService = N8nService();
+  bool isSincronizando = false;
 
-  final N8nService _n8nService = N8nService();
+  @override
+  void initState() {
+    super.initState();
+    cantidadController.text = '';
+  }
 
-  void _enviarDatos() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() => _isLoading = true);
-
-      final movimiento = InventarioMovimiento(
-        idProducto: _idController.text,
-        cantidad: int.parse(_cantidadController.text),
-        tipo: _tipoMovimiento,
+  void _guardarMovimiento(bool esEntrada) async {
+    int cantidad = int.tryParse(cantidadController.text) ?? 0;
+    if (widget.producto == null || cantidad <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Ingresa una cantidad válida'),
+          backgroundColor: Colors.orange,
+        ),
       );
+      return;
+    }
 
-      bool exito = await _n8nService.enviarMovimiento(movimiento);
+    // ❌ VALIDAR: No permitir salida mayor al stock disponible
+    if (!esEntrada && cantidad > widget.producto!.cantidad) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Operación no válida: No hay suficiente stock. Disponible: ${widget.producto!.cantidad}, solicitado: $cantidad',
+          ),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 4),
+        ),
+      );
+      return;
+    }
 
-      setState(() => _isLoading = false);
+    final int originalCantidad = widget.producto!.cantidad;
+    setState(() => isSincronizando = true);
+    setState(() {
+      widget.producto!.cantidad += esEntrada ? cantidad : -cantidad;
+      widget.producto!.ultimaActualizacion = DateTime.now().toIso8601String();
+    });
 
-      if (exito) {
-        _idController.clear();
-        _cantidadController.clear();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('✅ Movimiento registrado y n8n activado'), backgroundColor: Colors.green),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('❌ Error al conectar con el servidor'), backgroundColor: Colors.red),
-        );
-      }
+    try {
+      // Enviar solo los campos que n8n espera
+      await n8nService.actualizarStock(
+        id: widget.producto!.id,
+        cantidad: cantidad,
+        tipo: esEntrada ? 'entrada' : 'salida',
+      );
+      setState(() => isSincronizando = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(esEntrada ? 'Entrada registrada' : 'Salida registrada')),
+      );
+      Navigator.pop(context, true);
+    } catch (e) {
+      setState(() {
+        widget.producto!.cantidad = originalCantidad;
+        isSincronizando = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al actualizar stock: ${e.toString()}')),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Form(
-        key: _formKey,
-        child: ListView(
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.producto != null ? '${widget.producto!.nombre}' : 'Movimiento'),
+        backgroundColor: Colors.blue,
+        elevation: 2,
+        actions: [
+          if (isSincronizando) Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation<Color>(Colors.white)),
+            ),
+          ),
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
           children: [
-            const Text('Registrar Entrada/Salida', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 20),
-            TextFormField(
-              controller: _idController,
-              decoration: const InputDecoration(labelText: 'ID del Producto (ej: P001)', border: OutlineInputBorder()),
-              validator: (value) => value!.isEmpty ? 'Ingresa el ID' : null,
-            ),
-            const SizedBox(height: 15),
-            TextFormField(
-              controller: _cantidadController,
+            if (widget.producto != null) ...[  
+              Card(
+                elevation: 2,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      Text('SKU: ${widget.producto!.sku}', style: TextStyle(fontSize: 16, fontFamily: 'monospace', fontWeight: FontWeight.bold)),
+                      SizedBox(height: 12),
+                      Text('Stock Actual: ${widget.producto!.cantidad}', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.blue)),
+                      SizedBox(height: 8),
+                      Text('Mínimo: ${widget.producto!.stockMinimo}', style: TextStyle(fontSize: 14, color: Colors.grey[700])),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+            SizedBox(height: 20),
+            SizedBox(height: 20),
+            TextField(
+              controller: cantidadController,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: 'Cantidad', border: OutlineInputBorder()),
-              validator: (value) => value!.isEmpty ? 'Ingresa una cantidad' : null,
+              decoration: InputDecoration(
+                hintText: 'Cantidad a mover',
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                filled: true,
+                fillColor: Colors.grey[100],
+              ),
             ),
-            const SizedBox(height: 15),
-            DropdownButtonFormField<String>(
-              value: _tipoMovimiento,
-              decoration: const InputDecoration(labelText: 'Tipo de Movimiento', border: OutlineInputBorder()),
-              items: const [
-                DropdownMenuItem(value: 'entrada', child: Text('Entrada (+)')),
-                DropdownMenuItem(value: 'salida', child: Text('Salida (-)')),
+            SizedBox(height: 20),
+            SizedBox(height: 24),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton.icon(
+                  onPressed: () => _guardarMovimiento(true),
+                  icon: Icon(Icons.add_circle, size: 24),
+                  label: Text('ENTRADA', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: Size(130, 56),
+                    backgroundColor: Colors.green,
+                    foregroundColor: Colors.white,
+                  ),
+                ),
+                ElevatedButton.icon(
+                  onPressed: () => _guardarMovimiento(false),
+                  icon: Icon(Icons.remove_circle, size: 24),
+                  label: Text('SALIDA', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: Size(130, 56),
+                    backgroundColor: Colors.red,
+                    foregroundColor: Colors.white,
+                  ),
+                ),
               ],
-              onChanged: (value) => setState(() => _tipoMovimiento = value!),
-            ),
-            const SizedBox(height: 30),
-            ElevatedButton(
-              onPressed: _isLoading ? null : _enviarDatos,
-              style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 15)),
-              child: _isLoading 
-                ? const CircularProgressIndicator(color: Colors.white) 
-                : const Text('REGISTRAR EN N8N', style: TextStyle(fontSize: 16)),
             ),
           ],
         ),
