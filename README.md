@@ -1,9 +1,28 @@
-# inventario_pyme_flutter
+# Inventario PYME Flutter
 
-Escenario elegido
-Control de inventario para PyME
-Recibe registros de entradas/salidas, actualiza Airtable o Google Sheets y alerta por correo si hay stock bajo.
+Aplicacion Flutter para gestionar inventario de una PyME: listar productos, registrar entradas/salidas de stock, ver alertas de stock minimo y consultar historial de movimientos.
 
-Descripción
-Esta aplicación móvil desarrollada en Flutter permite a los dueños de PyMEs supervisar sus productos en tiempo real mediante una interfaz intuitiva. El sistema utiliza n8n como motor de automatización para sincronizar datos entre la app y servicios externos, garantizando una arquitectura desacoplada y escalable.
+## Como correr el proyecto
 
+### Requisitos
+- Flutter SDK instalado
+- Un dispositivo/emulador Android o navegador para Web
+
+### Pasos
+1. Instalar dependencias:
+
+```bash
+flutter pub get
+```
+
+2. Ejecutar en modo desarrollo:
+
+```bash
+flutter run
+```
+
+3. (Opcional) Generar APK release:
+
+```bash
+flutter build apk --release
+```
