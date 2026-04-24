@@ -4,9 +4,9 @@ import '../models/producto.dart';
 
 class N8nService {
   // Reemplaza con tus URLs reales de n8n
-  final String addProductUrl = 'https://stevenpajarol1.app.n8n.cloud/webhook/agregar-producto'; // Webhook para agregar nuevo producto
-  final String updateStockUrl = 'https://stevenpajarol1.app.n8n.cloud/webhook/inventario-pyme'; // Webhook para actualizar stock (entrada/salida)
-  final String getProductsUrl = 'https://stevenpajarol1.app.n8n.cloud/webhook/obtener-datos'; // Webhook para obtener productos del Sheet
+  final String addProductUrl = 'https://stevenpajarol2.app.n8n.cloud/webhook/agregar-producto'; // Webhook para agregar nuevo producto
+  final String updateStockUrl = 'https://stevenpajarol2.app.n8n.cloud/webhook/inventario-pyme'; // Webhook para actualizar stock (entrada/salida)
+  final String getProductsUrl = 'https://stevenpajarol2.app.n8n.cloud/webhook/obtener-datos'; // Webhook para obtener productos del Sheet
 
   Future<List<Producto>> obtenerProductos() async {
     try {
