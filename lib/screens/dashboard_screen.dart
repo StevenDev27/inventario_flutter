@@ -5,6 +5,8 @@ import 'historial_movimientos_screen.dart';
 import 'movimiento_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
+  const DashboardScreen({super.key});
+
   @override
   _DashboardScreenState createState() => _DashboardScreenState();
 }

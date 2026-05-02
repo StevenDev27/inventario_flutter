@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../services/n8n_service.dart';
 
 class DataManagementScreen extends StatefulWidget {
+  const DataManagementScreen({super.key});
+
   @override
   _DataManagementScreenState createState() => _DataManagementScreenState();
 }

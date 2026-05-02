@@ -91,7 +91,7 @@ class _MovimientoScreenState extends State<MovimientoScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.producto != null ? '${widget.producto!.nombre}' : 'Movimiento'),
+        title: Text(widget.producto != null ? widget.producto!.nombre : 'Movimiento'),
         backgroundColor: Colors.blue,
         elevation: 2,
         actions: [

@@ -40,7 +40,7 @@ class HistorialMovimientosScreen extends StatelessWidget {
 
           return ListView.separated(
             itemCount: historial.length,
-            separatorBuilder: (_, __) => const Divider(height: 1),
+            separatorBuilder: (_, _) => const Divider(height: 1),
             itemBuilder: (context, index) {
               final movimiento = historial[index];
               final esEntrada = movimiento.accion == 'entrada';
