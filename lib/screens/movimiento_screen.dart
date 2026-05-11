@@ -73,7 +73,9 @@ class _MovimientoScreenState extends State<MovimientoScreen> {
 
       setState(() => isSincronizando = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(esEntrada ? 'Entrada registrada' : 'Salida registrada')),
+        SnackBar(
+          content: Text(esEntrada ? 'Entrada registrada' : 'Salida registrada'),
+        ),
       );
       Navigator.pop(context, true);
     } catch (e) {
@@ -91,36 +93,59 @@ class _MovimientoScreenState extends State<MovimientoScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.producto != null ? widget.producto!.nombre : 'Movimiento'),
+        title: Text(
+          widget.producto != null ? widget.producto!.nombre : 'Movimiento',
+        ),
         backgroundColor: Colors.blue,
         elevation: 2,
         actions: [
-          if (isSincronizando) Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: SizedBox(
-              width: 24,
-              height: 24,
-              child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation<Color>(Colors.white)),
+          if (isSincronizando)
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              ),
             ),
-          ),
         ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            if (widget.producto != null) ...[  
+            if (widget.producto != null) ...[
               Card(
                 elevation: 2,
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     children: [
-                      Text('SKU: ${widget.producto!.sku}', style: TextStyle(fontSize: 16, fontFamily: 'monospace', fontWeight: FontWeight.bold)),
+                      Text(
+                        'SKU: ${widget.producto!.sku}',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontFamily: 'monospace',
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                       SizedBox(height: 12),
-                      Text('Stock Actual: ${widget.producto!.cantidad}', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.blue)),
+                      Text(
+                        'Stock Actual: ${widget.producto!.cantidad}',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue,
+                        ),
+                      ),
                       SizedBox(height: 8),
-                      Text('Mínimo: ${widget.producto!.stockMinimo}', style: TextStyle(fontSize: 14, color: Colors.grey[700])),
+                      Text(
+                        'Mínimo: ${widget.producto!.stockMinimo}',
+                        style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+                      ),
                     ],
                   ),
                 ),
@@ -133,7 +158,9 @@ class _MovimientoScreenState extends State<MovimientoScreen> {
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
                 hintText: 'Cantidad a mover',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
                 filled: true,
                 fillColor: Colors.grey[100],
               ),
@@ -146,7 +173,10 @@ class _MovimientoScreenState extends State<MovimientoScreen> {
                 ElevatedButton.icon(
                   onPressed: () => _guardarMovimiento(true),
                   icon: Icon(Icons.add_circle, size: 24),
-                  label: Text('ENTRADA', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  label: Text(
+                    'ENTRADA',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
                   style: ElevatedButton.styleFrom(
                     minimumSize: Size(130, 56),
                     backgroundColor: Colors.green,
@@ -156,7 +186,10 @@ class _MovimientoScreenState extends State<MovimientoScreen> {
                 ElevatedButton.icon(
                   onPressed: () => _guardarMovimiento(false),
                   icon: Icon(Icons.remove_circle, size: 24),
-                  label: Text('SALIDA', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  label: Text(
+                    'SALIDA',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
                   style: ElevatedButton.styleFrom(
                     minimumSize: Size(130, 56),
                     backgroundColor: Colors.red,

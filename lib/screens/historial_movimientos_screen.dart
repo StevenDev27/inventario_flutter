@@ -47,7 +47,9 @@ class HistorialMovimientosScreen extends StatelessWidget {
 
               return ListTile(
                 leading: CircleAvatar(
-                  backgroundColor: esEntrada ? Colors.green[100] : Colors.red[100],
+                  backgroundColor: esEntrada
+                      ? Colors.green[100]
+                      : Colors.red[100],
                   child: Icon(
                     esEntrada ? Icons.arrow_downward : Icons.arrow_upward,
                     color: esEntrada ? Colors.green[700] : Colors.red[700],

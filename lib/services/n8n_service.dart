@@ -4,9 +4,12 @@ import '../models/producto.dart';
 
 class N8nService {
   // Reemplaza con tus URLs reales de n8n
-  final String addProductUrl = 'https://stevenpajarol2.app.n8n.cloud/webhook/agregar-producto'; // Webhook para agregar nuevo producto
-  final String updateStockUrl = 'https://stevenpajarol2.app.n8n.cloud/webhook/inventario-pyme'; // Webhook para actualizar stock (entrada/salida)
-  final String getProductsUrl = 'https://stevenpajarol2.app.n8n.cloud/webhook/obtener-datos'; // Webhook para obtener productos del Sheet
+  final String addProductUrl =
+      'https://stevenpajarol2.app.n8n.cloud/webhook/agregar-producto'; // Webhook para agregar nuevo producto
+  final String updateStockUrl =
+      'https://stevenpajarol2.app.n8n.cloud/webhook/inventario-pyme'; // Webhook para actualizar stock (entrada/salida)
+  final String getProductsUrl =
+      'https://stevenpajarol2.app.n8n.cloud/webhook/obtener-datos'; // Webhook para obtener productos del Sheet
 
   Future<List<Producto>> obtenerProductos() async {
     try {
@@ -14,7 +17,9 @@ class N8nService {
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
         final List<dynamic> rows = _extractRows(body);
-        return rows.map((json) => Producto.fromJson(json as Map<String, dynamic>)).toList();
+        return rows
+            .map((json) => Producto.fromJson(json as Map<String, dynamic>))
+            .toList();
       } else {
         throw Exception('Error al obtener productos: ${response.statusCode}');
       }
@@ -67,19 +72,19 @@ class N8nService {
       print('URL: $updateStockUrl');
       print('PAYLOAD: $body');
       print('=================================');
-      
+
       final response = await http.post(
         Uri.parse(updateStockUrl),
         headers: {'Content-Type': 'application/json'},
         body: body,
       );
-      
+
       print('=================================');
       print('📥 RESPUESTA DE N8N');
       print('Status: ${response.statusCode}');
       print('Body: ${response.body}');
       print('=================================');
-      
+
       if (response.statusCode < 200 || response.statusCode >= 300) {
         throw Exception('HTTP ${response.statusCode}: ${response.body}');
       }
@@ -89,32 +94,32 @@ class N8nService {
     }
   }
 
-  Future<void> actualizarStock({required String id, required int cantidad, required String tipo}) async {
+  Future<void> actualizarStock({
+    required String id,
+    required int cantidad,
+    required String tipo,
+  }) async {
     try {
-      final payload = {
-        'id': id,
-        'cantidad': cantidad,
-        'tipo': tipo,
-      };
+      final payload = {'id': id, 'cantidad': cantidad, 'tipo': tipo};
       final body = jsonEncode(payload);
       print('=================================');
       print('📤 ENVIANDO MOVIMIENTO DE STOCK');
       print('URL: $updateStockUrl');
       print('PAYLOAD: $body');
       print('=================================');
-      
+
       final response = await http.post(
         Uri.parse(updateStockUrl),
         headers: {'Content-Type': 'application/json'},
         body: body,
       );
-      
+
       print('=================================');
       print('📥 RESPUESTA DE N8N');
       print('Status: ${response.statusCode}');
       print('Body: ${response.body}');
       print('=================================');
-      
+
       if (response.statusCode < 200 || response.statusCode >= 300) {
         throw Exception('HTTP ${response.statusCode}: ${response.body}');
       }
@@ -128,17 +133,19 @@ class N8nService {
     try {
       final body = jsonEncode(producto.toJson());
       print('📤 Enviando nuevo producto a n8n: $body');
-      
+
       final response = await http.post(
         Uri.parse(addProductUrl),
         headers: {'Content-Type': 'application/json'},
         body: body,
       );
-      
+
       print('📥 Respuesta de n8n (${response.statusCode}): ${response.body}');
-      
+
       if (response.statusCode < 200 || response.statusCode >= 300) {
-        throw Exception('Error al agregar producto: ${response.statusCode}\nRespuesta: ${response.body}');
+        throw Exception(
+          'Error al agregar producto: ${response.statusCode}\nRespuesta: ${response.body}',
+        );
       }
     } catch (e) {
       print('❌ Error en agregarProducto: $e');

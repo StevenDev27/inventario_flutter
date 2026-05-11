@@ -44,7 +44,9 @@ class Producto {
       'sku': sku,
       'stock': cantidad,
       'stock_minimo': stockMinimo,
-      'ultima_actualizacion': ultimaActualizacion.isEmpty ? DateTime.now().toIso8601String() : ultimaActualizacion,
+      'ultima_actualizacion': ultimaActualizacion.isEmpty
+          ? DateTime.now().toIso8601String()
+          : ultimaActualizacion,
     };
   }
 
